@@ -1,0 +1,18 @@
+{
+   "browser_action": {
+      "default_icon": "icon16.png",
+      "default_popup": "popup.html",
+      "icons": {
+         "128": "icon128.png",
+         "16": "icon16.png",
+         "48": "icon48.png"
+      }
+   },
+   "description": "A practical Board for ideating and explaining. perfect for remote learning and Zoom!",
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApjMfqCXnRmYhF2C6cUBrTXHgKufdSD/sSeLp+G1OhCuz7FZr4xuQQfbBDtFC9UZvDIjAx3yjrb3hXjOHyHv/2vqBuwAeUYP4BnOX+okg0xwPExNCG53eQOO8RKGWbwiAh9WFXSU+ULYbBcA7KP1AxgN34MDYy8UJBiarym76vWmypNG4YD5eej3IDicVC0M9KNX7EU65KH/JV6EEplARLaKr8WA1DuPIPAck5bXlL/jVyVfgmAXCaIfUKI7d/OratMOZZDqtqSRMcuDyopJK0OnyVTDt+GQ9YIJwkawOeLkHOeVJJ5HZrQw5wnnfLXZKKW9MNSRaK2dTUCFmAuOrwQIDAQAB",
+   "manifest_version": 2,
+   "name": "Writeboard",
+   "permissions": [  ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "0.1"
+}

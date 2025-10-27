@@ -1,0 +1,14 @@
+"Id";"Designator";"Footprint";"Quantity";"Designation";"Supplier and ref";
+1;"J2,J7,J3,J4,J5,J6";"CUI_TB009-508-02BE";6;"Screw_Terminal_01x02";;;
+2;"DRV8874_Carrier_Board3,DRV8874_Carrier_Board5,DRV8874_Carrier_Board2,DRV8874_Carrier_Board4,DRV8874_Carrier_Board1";"DRV887X";5;"~";;;
+3;"SW2,SW1";"rocker_switch_10a";2;"SW_Wuerth_450301014042";;;
+4;"Q1";"TO254P469X1042X1967-3P";1;"IRLZ44NPBF";;;
+5;"PS2";"CONV_RE-123.3S";1;"RE-123.3S";;;
+6;"U6";"LGA-28_5.2x3.8mm_P0.5mm";1;"BNO055";;;
+7;"R1,R2";"R_Axial_DIN0204_L3.6mm_D1.6mm_P2.54mm_Vertical";2;"R";;;
+8;"PS1";"CONV_RSE-2405SZ_H2";1;"RSE-2405SZ_H2";;;
+9;"D3,D2";"LED_Kingbright_APFA3010_3x1.5mm_Horizontal";2;"LED";;;
+10;"IC1";"TEENSY41";1;"TEENSY_4.1";;;
+11;"C1";"C_0201_0603Metric_Pad0.64x0.40mm_HandSolder";1;"C_Small";;;
+12;"J1";"AMASS_XT60-M";1;"XT60-M";;;
+13;"J8";"TE_1-87465-9";1;"Conn_01x18_Pin";;;

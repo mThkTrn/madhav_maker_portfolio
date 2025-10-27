@@ -1,0 +1,412 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Forj{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Welcome Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Welcome back, {{ current_user.name }}! 👋</h1>
+        <p class="mt-2 text-gray-600">Here's what's happening with your datasets.</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="glass-card p-6 rounded-xl transform transition hover:scale-105">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Total Datasets</p>
+                    <p class="mt-1 text-3xl font-semibold text-gray-900">{{ datasets|length }}</p>
+                </div>
+                <div class="p-3 bg-blue-100 rounded-lg">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="mt-2 text-sm text-gray-500">
+                {% set ready_count = datasets|selectattr('status', 'equalto', 'completed')|list|length %}
+                {{ ready_count }} ready
+                {% set processing_count = datasets|selectattr('status', 'equalto', 'processing')|list|length %}
+                {% if processing_count > 0 %}
+                    • <span class="text-yellow-600">{{ processing_count }} processing</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="glass-card p-6 rounded-xl transform transition hover:scale-105">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Total Rows</p>
+                    <p class="mt-1 text-3xl font-semibold text-gray-900">
+                        {{ datasets|sum(attribute='row_count')|default(0)|number_format }}
+                    </p>
+                </div>
+                <div class="p-3 bg-green-100 rounded-lg">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                </div>
+            </div>
+            {% if datasets %}
+            <div class="mt-2 text-sm text-gray-500">
+                Avg. {{ (datasets|sum(attribute='row_count') / datasets|length)|round|int }} rows per dataset
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-medium text-gray-900">Quick Actions</h2>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <a href="{{ url_for('create_dataset') }}" class="group glass-card p-4 rounded-lg border border-transparent hover:border-blue-200 hover:shadow-md transition duration-150 ease-in-out">
+                <div class="flex items-center">
+                    <div class="p-2 bg-blue-100 rounded-lg mr-3 group-hover:bg-blue-200 transition duration-150">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-medium text-gray-900">New Dataset</h3>
+                        <p class="text-sm text-gray-500">Create from scratch</p>
+                    </div>
+                </div>
+            </a>
+            
+            <!-- <a href="#" class="group glass-card p-4 rounded-lg border border-transparent hover:border-green-200 hover:shadow-md transition duration-150 ease-in-out">
+                <div class="flex items-center">
+                    <div class="p-2 bg-green-100 rounded-lg mr-3 group-hover:bg-green-200 transition duration-150">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-medium text-gray-900">Import Data</h3>
+                        <p class="text-sm text-gray-500">Upload CSV or JSON</p>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="#" class="group glass-card p-4 rounded-lg border border-transparent hover:border-purple-200 hover:shadow-md transition duration-150 ease-in-out">
+                <div class="flex items-center">
+                    <div class="p-2 bg-purple-100 rounded-lg mr-3 group-hover:bg-purple-200 transition duration-150">
+                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-medium text-gray-900">Templates</h3>
+                        <p class="text-sm text-gray-500">Use a template</p>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="#" class="group glass-card p-4 rounded-lg border border-transparent hover:border-yellow-200 hover:shadow-md transition duration-150 ease-in-out">
+                <div class="flex items-center">
+                    <div class="p-2 bg-yellow-100 rounded-lg mr-3 group-hover:bg-yellow-200 transition duration-150">
+                        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-medium text-gray-900">Get Help</h3>
+                        <p class="text-sm text-gray-500">Documentation & support</p>
+                    </div>
+                </div>
+            </a> -->
+        </div>
+    </div>
+
+    <!-- Datasets Table -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-medium text-gray-900">Your Datasets</h2>
+            <a href="{{ url_for('create_dataset') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                New Dataset
+            </a>
+        </div>
+        
+        {% if datasets %}
+            <div class="glass-card overflow-hidden rounded-xl">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dataset</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th scope="col" class="relative px-6 py-3">
+                                    <span class="sr-only">Actions</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for dataset in datasets %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10 rounded-lg flex items-center justify-center {% if dataset.status == 'completed' %}bg-green-100 text-green-600{% elif dataset.status == 'processing' %}bg-blue-100 text-blue-600{% elif dataset.status == 'failed' %}bg-red-100 text-red-600{% else %}bg-gray-100 text-gray-600{% endif %}">
+                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2h-1"></path>
+                                            </svg>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">{{ dataset.name }}</div>
+                                            <div class="text-sm text-gray-500">{{ (dataset.description or 'No description')[:50] }}{% if dataset.description and dataset.description|length > 50 %}...{% endif %}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900">{{ dataset.row_count|number_format }} rows • {{ (dataset.columns|from_json)|length }} columns</div>
+                                    <div class="text-xs text-gray-500 mt-1">
+                                        {% for col in (dataset.columns|from_json)[:3] %}
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 mr-1">{{ col }}</span>
+                                        {% endfor %}
+                                        {% if (dataset.columns|from_json)|length > 3 %}
+                                            <span class="text-gray-400">+{{ (dataset.columns|from_json)|length - 3 }} more</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ dataset.created_at.strftime('%b %d, %Y') }}</div>
+                                    <div class="text-xs text-gray-500">{{ dataset.created_at|timesince }} ago</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if dataset.status == 'completed' %}
+                                        <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            <svg class="-ml-0.5 mr-1.5 h-2 w-2 text-green-400" fill="currentColor" viewBox="0 0 8 8">
+                                                <circle cx="4" cy="4" r="3" />
+                                            </svg>
+                                            Ready
+                                        </span>
+                                    {% elif dataset.status == 'processing' %}
+                                        <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            <svg class="animate-spin -ml-1 mr-1.5 h-2 w-2 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            Processing
+                                        </span>
+                                    {% elif dataset.status == 'failed' %}
+                                        <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                            <svg class="-ml-0.5 mr-1.5 h-2 w-2 text-red-400" fill="currentColor" viewBox="0 0 8 8">
+                                                <circle cx="4" cy="4" r="3" />
+                                            </svg>
+                                            Failed
+                                        </span>
+                                    {% else %}
+                                        <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                            <svg class="-ml-0.5 mr-1.5 h-2 w-2 text-gray-400" fill="currentColor" viewBox="0 0 8 8">
+                                                <circle cx="4" cy="4" r="3" />
+                                            </svg>
+                                            {{ dataset.status|title }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex justify-end space-x-3">
+                                        {% if dataset.status == 'completed' %}
+                                            <button onclick="downloadDataset('{{ dataset.id }}')" class="text-blue-600 hover:text-blue-900 transition-colors duration-150" title="Download">
+                                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                                </svg>
+                                            </button>
+                                        {% endif %}
+                                        <button onclick="deleteDataset('{{ dataset.id }}', '{{ dataset.name }}')" class="text-red-600 hover:text-red-900 transition-colors duration-150" title="Delete">
+                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="text-center glass-card py-16 rounded-xl">
+                <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-blue-50">
+                    <svg class="h-12 w-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <h3 class="mt-4 text-lg font-medium text-gray-900">No datasets yet</h3>
+                <p class="mt-1 text-sm text-gray-500 max-w-md mx-auto">You haven't created any datasets yet. Get started by creating your first dataset to analyze and visualize your data.</p>
+                <div class="mt-6">
+                    <a href="{{ url_for('create_dataset') }}" class="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
+                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Create New Dataset
+                    </a>
+                </div>
+                <!-- <div class="mt-4">
+                    <p class="text-xs text-gray-400">or <a href="#" class="text-blue-600 hover:text-blue-500 font-medium">import from file</a></p>
+                </div> -->
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Recent Activity -->
+    <!-- <div>
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-medium text-gray-900">Recent Activity</h2>
+            <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-500">View all activity</a>
+        </div>
+        
+        <div class="glass-card overflow-hidden rounded-xl">
+            <ul class="divide-y divide-gray-200">
+                <li class="px-6 py-4">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                            <span class="text-blue-600 font-medium">JD</span>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-900">You created a new dataset</p>
+                            <p class="text-sm text-gray-500">2 hours ago</p>
+                        </div>
+                    </div>
+                </li>
+                <li class="px-6 py-4">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                            <span class="text-green-600 font-medium">S</span>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-900">System updated your dataset</p>
+                            <p class="text-sm text-gray-500">5 hours ago</p>
+                        </div>
+                    </div>
+                </li>
+                <li class="px-6 py-4">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                            <span class="text-purple-600 font-medium">M</span>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-900">You shared a dataset with the team</p>
+                            <p class="text-sm text-gray-500">1 day ago</p>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div> -->
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function deleteDataset(datasetId, datasetName) {
+    if (confirm(`Are you sure you want to delete "${datasetName}"? This action cannot be undone.`)) {
+        fetch(`/datasets/${datasetId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token() }}',
+                'Content-Type': 'application/json'
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to delete dataset');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Reload the page to update the dataset list
+                window.location.reload();
+            } else {
+                throw new Error(data.message || 'Failed to delete dataset');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting dataset:', error);
+            alert('Failed to delete dataset. Please try again.');
+        });
+    }
+}
+    
+// Download dataset function
+async function downloadDataset(datasetId) {
+    if (!datasetId) {
+        console.error('No dataset ID provided');
+        return;
+    }
+    
+    try {
+        // Show loading state if needed
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        loadingIndicator.innerHTML = `
+            <div class="bg-white p-4 rounded-lg shadow-lg">
+                <div class="flex items-center">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+                    <span>Preparing download...</span>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(loadingIndicator);
+        
+        // Get the dataset from the server
+        const response = await fetch(`/api/datasets/${datasetId}`);
+        if (!response.ok) {
+            throw new Error('Failed to get dataset information');
+        }
+        
+        const data = await response.json();
+        
+        // Create a download link for the dataset
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `dataset_${data.name || new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        
+        // Clean up
+        setTimeout(() => {
+            URL.revokeObjectURL(url);
+            a.remove();
+            document.body.removeChild(loadingIndicator);
+        }, 100);
+        
+    } catch (error) {
+        console.error('Error downloading dataset:', error);
+        alert('Failed to download dataset. Please try again.');
+        const loadingIndicator = document.querySelector('.fixed.inset-0');
+        if (loadingIndicator) {
+            document.body.removeChild(loadingIndicator);
+        }
+    }
+}
+    
+// Add any custom JavaScript for the dashboard here
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize any dashboard-specific JavaScript
+    console.log('Dashboard loaded');
+    
+    // Update download buttons to use the new download function
+    document.querySelectorAll('[data-download-dataset]').forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const datasetId = button.getAttribute('data-download-dataset');
+            if (datasetId) {
+                downloadDataset(datasetId);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

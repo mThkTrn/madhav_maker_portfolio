@@ -1,0 +1,22 @@
+# Core
+Flask
+Flask-SQLAlchemy
+Flask-Login
+Werkzeug
+Jinja2
+itsdangerous
+flask_migrate
+flask_wtf
+
+# Database
+SQLAlchemy
+alembic
+
+# File Processing
+PyPDF2
+python-docx
+python-magic-bin==0.4.14; sys_platform == 'win32'
+
+regex
+numpy
+email_validator

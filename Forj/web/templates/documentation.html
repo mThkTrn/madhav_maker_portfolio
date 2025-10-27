@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Documentation - Forj{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">Documentation</h1>
+        <p class="text-xl text-gray-600">Learn how to use Forj to create and manage your datasets</p>
+    </div>
+
+    <div class="glass-card p-8 mb-8">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-4">Getting Started</h2>
+        <div class="prose max-w-none">
+            <h3 class="text-xl font-medium text-gray-800 mt-6 mb-3">Creating Your First Dataset</h3>
+            <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                <li>Click on "Create Dataset" in the dashboard</li>
+                <li>Enter a description of the data you want to generate</li>
+                <li>Specify the columns you need in your dataset</li>
+                <li>Set the number of rows you want to generate</li>
+                <li>Click "Generate Sample" and wait for the process to complete</li>
+            </ol>
+
+            <h3 class="text-xl font-medium text-gray-800 mt-8 mb-3">Managing Datasets</h3>
+            <p class="text-gray-700">
+                Once generated, you can view, download, or delete your datasets from the dashboard.
+                Each dataset shows its status, size, and creation date for easy reference.
+            </p>
+
+            <h3 class="text-xl font-medium text-gray-800 mt-8 mb-3">Data Privacy</h3>
+            <p class="text-gray-700">
+                Your data is stored securely and privately. We never share your datasets with third parties.
+                For more information, please see our <a href="{{ url_for('privacy_policy') }}" class="text-blue-600 hover:underline">Privacy Policy</a>.
+            </p>
+        </div>
+    </div>
+
+    <div class="glass-card p-8">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-4">Frequently Asked Questions</h2>
+        <div class="space-y-6">
+            <div>
+                <h3 class="text-lg font-medium text-gray-800">How is my data secured?</h3>
+                <p class="mt-2 text-gray-600">
+                    All data is encrypted both in transit and at rest. We use industry-standard security measures to protect your information.
+                </p>
+            </div>
+            <div>
+                <h3 class="text-lg font-medium text-gray-800">Can I export my data?</h3>
+                <p class="mt-2 text-gray-600">
+                    Yes, you can download your datasets in JSON format at any time from the dashboard.
+                </p>
+            </div>
+            <div>
+                <h3 class="text-lg font-medium text-gray-800">Is there a limit to dataset size?</h3>
+                <p class="mt-2 text-gray-600">
+                    Free accounts can generate datasets up to 10,000 rows. Contact support for larger datasets.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

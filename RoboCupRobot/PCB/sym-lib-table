@@ -1,0 +1,8 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "XT60 Male-bad")(type "KiCad")(uri "C:/Users/madha/Downloads/ul_1805375/KiCADv6/2024-10-14_00-14-06.kicad_sym")(options "")(descr ""))
+  (lib (name "Teensy 4.1")(type "KiCad")(uri "C:/Users/madha/Downloads/TEENSY_4.1/TEENSY_4.1.kicad_sym")(options "")(descr ""))
+  (lib (name "3.3V Buck")(type "KiCad")(uri "C:/Users/madha/Downloads/RE-123.3S/RE-123.3S.kicad_sym")(options "")(descr ""))
+  (lib (name "5V Buck")(type "KiCad")(uri "C:/Users/madha/Downloads/RSE-2405SZ_H2/RSE-2405SZ_H2.kicad_sym")(options "")(descr ""))
+  (lib (name "XT60 Male")(type "KiCad")(uri "C:/Users/madha/Downloads/XT60-M/XT60-M.kicad_sym")(options "")(descr ""))
+)

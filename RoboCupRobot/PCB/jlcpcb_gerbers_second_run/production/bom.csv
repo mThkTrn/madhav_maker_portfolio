@@ -1,0 +1,4 @@
+﻿Designator,Footprint,Quantity,Value,LCSC Part #,Details
+"DRV8874_CARRIER_BOARD1, DRV8874_CARRIER_BOARD2, DRV8874_CARRIER_BOARD3, DRV8874_CARRIER_BOARD4, DRV8874_CARRIER_BOARD5",DRV887X,5,Please attach 2 of the 1x6 female headers (LCSC part below) to each side of the motor driver footprint.,C40877,
+IC1,TEENSY41,1,"DO NOT ATTACH A TEENSY. Inastead, please attach 2 of the 1x24 female headers (LCSC part below) to each side of the teensy. Do not worry about the pins in the middle of the teensy, only attach 2 strip sof 24 to either side.",C41376163,
+"J10, J8",TE_1-87465-9,2,Conn_01x18_Pin,C5142873,

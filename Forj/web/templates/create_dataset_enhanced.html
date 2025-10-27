@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Dataset - Forj{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Animation for feedback items */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-out forwards;
+    }
+    
+    /* Smooth transitions */
+    .transition-all {
+        transition: all 0.2s ease-in-out;
+    }
+    
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+    
+    /* Log entry styling */
+    .log-entry {
+        padding: 4px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .log-entry:last-child {
+        border-bottom: none;
+    }
+    
+    .log-info {
+        color: #4b5563; /* gray-600 */
+    }
+    
+    .log-success {
+        color: #059669; /* emerald-600 */
+    }
+    
+    .log-warning {
+        color: #d97706; /* amber-600 */
+    }
+    
+    .log-error {
+        color: #dc2626; /* red-600 */
+    }
+    
+    /* Sample card styling */
+    .sample-card {
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .sample-card:hover {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transform: translateY(-2px);
+    }
+    
+    /* Feedback buttons */
+    .feedback-btn {
+        transition: all 0.2s ease;
+    }
+    
+    .feedback-btn:hover {
+        transform: scale(1.1);
+    }
+    
+    /* Scrollable content */
+    .scrollable-content {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    /* Loading spinner */
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .animate-spin {
+        animation: spin 1s linear infinite;
+    }
+    
+    /* Feedback section */
+    #feedbackSection {
+        display: none;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+    }
+    
+    #feedbackSection.visible {
+        display: block;
+        opacity: 1;
+    }
+    
+    /* Sample container */
+    #samplesContainer {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        #samplesContainer {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Create New Dataset</h1>
+    
+    <!-- Rest of the template will be dynamically loaded -->
+</div>
+
+<script>
+    // Global variables
+    let currentSessionId = null;
+    let currentSamples = [];
+    let feedbackSection = null;
+    let resultSection = null;
+    
+    // Utility functions
+    function autoResize(textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = (textarea.scrollHeight) + 'px';
+    }
+    
+    function updateProgress(percent, message) {
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        
+        if (progressBar) {
+            progressBar.style.width = `${Math.min(100, Math.max(0, percent))}%`;
+            progressBar.setAttribute('aria-valuenow', percent);
+        }
+        
+        if (progressText && message) {
+            progressText.textContent = message;
+        }
+    }
+    
+    function log(message, type = 'info') {
+        const logContainer = document.getElementById('logContainer');
+        if (!logContainer) return;
+        
+        const logEntry = document.createElement('div');
+        logEntry.className = `log-entry log-${type}`;
+        
+        const timestamp = new Date().toLocaleTimeString();
+        logEntry.innerHTML = `[${timestamp}] <span class="font-medium">${message}</span>`;
+        
+        logContainer.appendChild(logEntry);
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+    
+    function showError(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'bg-red-50 border-l-4 border-red-500 p-4 mb-4';
+        errorDiv.innerHTML = `
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-red-700">${message}</p>
+                </div>
+            </div>
+        `;
+        
+        const form = document.getElementById('datasetForm');
+        if (form) {
+            form.prepend(errorDiv);
+            
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 10000);
+        }
+    }
+    
+    // Initialize when the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Existing initialization code will go here
+    });
+</script>
+{% endblock %}

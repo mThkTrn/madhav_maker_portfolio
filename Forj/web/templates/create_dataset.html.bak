@@ -1,0 +1,710 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Dataset - Forj{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Create New Dataset</h1>
+    
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <form id="datasetForm" class="space-y-6">
+            {{ form.hidden_tag() }}
+            
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Dataset Description</label>
+                <textarea id="description" name="description" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="3" placeholder="Describe the dataset you want to generate (e.g., 'Customer data for an e-commerce store with purchase history')" required>{{ form.description.data or '' }}</textarea>
+                <p class="mt-1 text-sm text-gray-500">Be as specific as possible about the data you need.</p>
+            </div>
+            
+            <div>
+                <label for="columns" class="block text-sm font-medium text-gray-700 mb-1">Columns</label>
+                <textarea id="columns" name="columns" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="5" placeholder="Enter one column name per line&#10;Example:
+first_name
+last_name
+email
+phone
+address" required>{{ form.columns.data or '' }}</textarea>
+                <p class="mt-1 text-sm text-gray-500">Enter one column name per line. You can add descriptions in parentheses, e.g., "price (in USD)"</p>
+            </div>
+            
+            <div class="w-1/3">
+                <label for="row_count" class="block text-sm font-medium text-gray-700 mb-1">Number of Rows</label>
+                <input type="number" id="row_count" name="row_count" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" min="1" max="10000" value="{{ form.row_count.data or '100' }}" required>
+            </div>
+            
+            <div class="flex justify-end space-x-3 pt-4">
+                <a href="{{ url_for('dashboard') }}" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Cancel
+                </a>
+                <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center" id="generateButton">
+                    <span class="button-text">Generate Sample</span>
+                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white hidden" id="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Loading State -->
+    <div id="loadingSection" class="mt-8 bg-white rounded-lg shadow-md p-6 hidden">
+        <div class="flex flex-col items-center justify-center py-8">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+            <p class="text-lg font-medium text-gray-700">Generating your dataset...</p>
+            <p class="text-sm text-gray-500 mt-2">This may take a moment. Please do not close this page.</p>
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mt-4 max-w-md">
+                <div id="progressBar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-in-out" style="width: 0%"></div>
+            </div>
+            <p id="progressText" class="text-sm text-gray-600 mt-2">Initializing...</p>
+            <div id="logContainer" class="mt-4 text-left w-full max-w-2xl h-48 overflow-y-auto bg-gray-50 p-3 rounded-md font-mono text-sm border border-gray-200">
+                <!-- Logs will appear here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Feedback Section -->
+    <div id="feedbackSection" class="mt-8 bg-white rounded-lg shadow-md p-6 hidden">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-semibold">Review Samples</h2>
+            <span id="feedbackRound" class="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                Round <span id="currentRound">1</span> of 3
+            </span>
+        </div>
+        
+        <div id="samplesContainer" class="space-y-6">
+            <!-- Sample cards will be inserted here by JavaScript -->
+            <div class="text-center py-8 text-gray-500" id="noSamplesMessage">
+                <p>Generating samples for review...</p>
+            </div>
+        </div>
+        
+        <div class="mt-8 pt-6 border-t border-gray-200 flex justify-end">
+            <button id="submitFeedbackBtn" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Submit Feedback & Continue
+            </button>
+        </div>
+    </div>
+    
+    <!-- Results Section -->
+    <div class="mt-8 bg-white rounded-lg shadow-md p-6 hidden transition-all duration-300 ease-in-out transform" id="resultSection">
+        <h2 class="text-xl font-semibold mb-4">
+            Dataset Generation Complete!
+        </h2>
+        <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-green-700">
+                        Successfully generated <span id="finalRowCount" class="font-medium">0</span> rows of data.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mb-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Preview</h3>
+            <div id="sampleData" class="overflow-x-auto">
+                <p class="text-gray-500 text-center py-4">Loading preview...</p>
+            </div>
+        </div>
+        
+        <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+            <a href="{{ url_for('dashboard') }}" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Back to Dashboard
+            </a>
+            <button id="downloadBtn" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                Download Dataset
+            </button>
+        </div>
+    </div>
+    
+    <div id="loadingSection" class="mt-8 bg-white rounded-lg shadow-md p-6 text-center hidden">
+        <div class="flex flex-col items-center justify-center py-8">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+            <p class="text-lg font-medium text-gray-700">Generating your dataset...</p>
+            <p class="text-sm text-gray-500 mt-2">This may take a moment. Please do not close this page.</p>
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mt-4 max-w-md">
+                <div id="progressBar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+            </div>
+            <p id="progressText" class="text-sm text-gray-600 mt-2">0% complete</p>
+            <div id="logContainer" class="mt-4 text-left w-full max-w-2xl h-48 overflow-y-auto bg-gray-50 p-3 rounded-md font-mono text-sm">
+                <!-- Logs will appear here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Global variables
+    let currentSessionId = null;
+    let currentSamples = [];
+    let feedbackSection = null;
+    let resultSection = null;
+    
+    // Initialize when the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('datasetForm');
+        const loadingSection = document.getElementById('loadingSection');
+        feedbackSection = document.getElementById('feedbackSection');
+        resultSection = document.getElementById('resultSection');
+        const submitButton = document.querySelector('button[type="submit"]');
+        const submitFeedbackBtn = document.getElementById('submitFeedbackBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        
+        // Auto-resize textareas
+        const textareas = document.querySelectorAll('textarea');
+        textareas.forEach(textarea => {
+            textarea.addEventListener('input', () => autoResize(textarea));
+            // Initial resize
+            autoResize(textarea);
+        });
+        
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            startGeneration();
+        });
+        
+        // Submit feedback button
+        if (submitFeedbackBtn) {
+            submitFeedbackBtn.addEventListener('click', submitFeedback);
+        }
+        
+        // Download button
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', downloadDataset);
+        }
+        
+        // Update progress bar
+        function updateProgress(percent, message) {
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = `${percent}%`;
+            const progressText = document.getElementById('progressText');
+            progressText.textContent = message || `Processing... ${Math.round(percent)}%`;
+        }
+        
+        // Toggle loading state
+        function setLoading(isLoading) {
+            const generateButton = document.getElementById('generateButton');
+            const spinner = document.getElementById('spinner');
+            const buttonText = document.querySelector('.button-text');
+            generateButton.disabled = isLoading;
+            if (isLoading) {
+                buttonText.textContent = 'Generating...';
+                spinner.classList.remove('hidden');
+            } else {
+                buttonText.textContent = 'Generate Sample';
+                spinner.classList.add('hidden');
+            }
+        }
+        
+        // Start the dataset generation process
+        async function startGeneration() {
+            const description = document.getElementById('description').value;
+            const columns = document.getElementById('columns').value.split('\n')
+                .map(col => col.trim())
+                .filter(col => col.length > 0);
+            const rowCount = document.getElementById('row_count').value;
+            
+            if (!description) {
+                showError('Please enter a description for your dataset');
+                return;
+            }
+            
+            if (columns.length === 0) {
+                showError('Please enter at least one column');
+                return;
+            }
+            
+            try {
+                // Show loading state
+                setLoading(true);
+                resultSection.classList.add('hidden');
+                feedbackSection.classList.add('hidden');
+                loadingSection.classList.remove('hidden');
+                const logContainer = document.getElementById('logContainer');
+                logContainer.innerHTML = ''; // Clear previous logs
+                updateProgress(10, 'Starting dataset generation...');
+                
+                // Start the generation process
+                const response = await fetch('/api/start-generation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        description: description,
+                        columns: columns,
+                        row_count: rowCount
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || 'Failed to start dataset generation');
+                }
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Store the session ID
+                currentSessionId = data.session_id;
+                
+                // Display the samples for feedback
+                displaySamplesForFeedback(data.samples, data.feedback_round);
+                
+                // Update UI
+                updateProgress(100, 'Samples generated!');
+                loadingSection.classList.add('hidden');
+                feedbackSection.classList.remove('hidden');
+                feedbackSection.scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                console.error('Error:', error);
+                log(`Error: ${error.message}`, 'error');
+                showError(error.message);
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        // Display samples for user feedback
+        function displaySamplesForFeedback(samples, feedbackRound) {
+            const samplesContainer = document.getElementById('samplesContainer');
+            samplesContainer.innerHTML = '';
+            currentSamples = samples;
+            
+            // Update feedback round
+            const currentRoundEl = document.getElementById('currentRound');
+            currentRoundEl.textContent = feedbackRound;
+            
+            if (!samples || samples.length === 0) {
+                const noSamplesMessage = document.getElementById('noSamplesMessage');
+                noSamplesMessage.classList.remove('hidden');
+                return;
+            }
+            
+            const noSamplesMessage = document.getElementById('noSamplesMessage');
+            noSamplesMessage.classList.add('hidden');
+            
+            samples.forEach((sample, index) => {
+                const sampleCard = document.createElement('div');
+                sampleCard.className = 'bg-white border border-gray-200 rounded-lg p-4';
+                sampleCard.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="font-medium text-gray-900">Sample #${index + 1}</h3>
+                        <div class="flex space-x-2">
+                            <button onclick="handleFeedback('${sample.id}', true, this)" 
+                                    class="feedback-btn px-3 py-1 rounded-full text-sm ${sample.approved === true ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600 hover:bg-green-50'}">
+                                👍
+                            </button>
+                            <button onclick="handleFeedback('${sample.id}', false, this)" 
+                                    class="feedback-btn px-3 py-1 rounded-full text-sm ${sample.approved === false ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-600 hover:bg-red-50'}">
+                                👎
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-md mb-3">
+                        <pre class="text-sm text-gray-700 whitespace-pre-wrap">${JSON.stringify(sample.data, null, 2)}</pre>
+                    </div>
+                    <div class="mt-2">
+                        <label for="feedback-${sample.id}" class="block text-sm font-medium text-gray-700 mb-1">Your Feedback (optional)</label>
+                        <textarea id="feedback-${sample.id}" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" 
+                                placeholder="What do you like or dislike about this sample?" 
+                                rows="2">${sample.feedback || ''}</textarea>
+                    </div>
+                `;
+                samplesContainer.appendChild(sampleCard);
+            });
+        }
+        
+        // Handle feedback for a sample
+        function handleFeedback(sampleId, approved, button) {
+            // Find the sample in currentSamples
+            const sample = currentSamples.find(s => s.id === sampleId);
+            if (!sample) return;
+            
+            // Update the sample's approved status
+            sample.approved = approved;
+            
+            // Update the UI
+            const card = button.closest('.bg-white');
+            const buttons = card.querySelectorAll('.feedback-btn');
+            
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
+                btn.classList.add('bg-gray-100', 'text-gray-600');
+            });
+            
+            if (approved) {
+                button.classList.remove('bg-gray-100', 'text-gray-600');
+                button.classList.add('bg-green-100', 'text-green-800');
+            } else {
+                button.classList.remove('bg-gray-100', 'text-gray-600');
+                button.classList.add('bg-red-100', 'text-red-800');
+            }
+        }
+        
+        // Submit feedback for all samples
+        async function submitFeedback() {
+            if (!currentSessionId) {
+                showError('No active generation session');
+                return;
+            }
+            
+            try {
+                setLoading(true);
+                log('Submitting feedback and generating next batch...', 'info');
+                
+                // Collect feedback for all samples
+                const feedbackItems = [];
+                const sampleCards = document.getElementById('samplesContainer').querySelectorAll('.bg-white');
+                
+                sampleCards.forEach((card, index) => {
+                    const sampleId = currentSamples[index].id;
+                    const textarea = card.querySelector('textarea');
+                    const approvedBtn = card.querySelector('.bg-green-100');
+                    const approved = approvedBtn && approvedBtn.textContent.includes('👍');
+                    
+                    // If no feedback was given, skip this sample
+                    if (approved === null) return;
+                    
+                    feedbackItems.push({
+                        sample_id: sampleId,
+                        approved: approved,
+                        text: textarea ? textarea.value.trim() : ''
+                    });
+                });
+                
+                if (feedbackItems.length === 0) {
+                    showError('Please provide feedback for at least one sample');
+                    return;
+                }
+                
+                // Submit feedback to the server
+                const response = await fetch('/api/submit-feedback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        session_id: currentSessionId,
+                        feedback: feedbackItems
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || 'Failed to submit feedback');
+                }
+                
+                const data = await response.json();
+                
+                if (data.status === 'completed') {
+                    // Show final dataset
+                    displayFinalDataset(data.dataset, data.total_rows);
+                    feedbackSection.classList.add('hidden');
+                    resultSection.classList.remove('hidden');
+                    resultSection.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    // Show next batch of samples
+                    displaySamplesForFeedback(data.samples, data.feedback_round);
+                    feedbackSection.scrollIntoView({ behavior: 'smooth' });
+                }
+                
+            } catch (error) {
+                console.error('Error submitting feedback:', error);
+                showError(error.message || 'Failed to submit feedback');
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        // Display the final dataset
+        function displayFinalDataset(dataset, totalRows) {
+            if (!dataset || dataset.length === 0) {
+                showError('No data was generated');
+                return;
+            }
+            
+            // Update the row count
+            const finalRowCountEl = document.getElementById('finalRowCount');
+            finalRowCountEl.textContent = totalRows || dataset.length;
+            
+            // Display a preview of the dataset
+            displaySampleData(dataset);
+        }
+        
+        // Download the generated dataset
+        function downloadDataset() {
+            if (!currentSessionId) {
+                showError('No dataset to download');
+                return;
+            }
+            
+            // In a real implementation, you would generate and download the file
+            // For now, we'll just show a message
+            alert('Download functionality will be implemented here');
+            
+            // Example implementation:
+            // const data = JSON.stringify(currentDataset, null, 2);
+            // const blob = new Blob([data], { type: 'application/json' });
+            // const url = URL.createObjectURL(blob);
+            // const a = document.createElement('a');
+            // a.href = url;
+            // a.download = `dataset_${new Date().toISOString().split('T')[0]}.json`;
+            // document.body.appendChild(a);
+            // a.click();
+            // document.body.removeChild(a);
+            // URL.revokeObjectURL(url);
+        }
+        
+        // Display sample data in a table
+        function displaySampleData(data) {
+            if (!data || data.length === 0) {
+                return;
+            }
+            
+            // Get container and clear it
+            const sampleDataContainer = document.getElementById('sampleDataContainer');
+            if (!sampleDataContainer) {
+                console.error('sampleDataContainer not found');
+                return;
+            }
+            
+            // Get headers from first object
+            const headers = [];
+            const firstItem = data[0];
+            for (const key in firstItem) {
+                if (firstItem.hasOwnProperty(key)) {
+                    headers.push(key);
+                }
+            }
+            
+            // Convert data to array of objects if it's not already
+            const displayData = Array.isArray(data) ? data : [data];
+            
+            // Create table HTML
+            let html = `
+                <div class="flex flex-col">
+                    <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                        <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                            <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>`;
+            
+            
+            // Table headers
+            headers.forEach(header => {
+                html += `
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        ${header}
+                    </th>`;
+            });
+            
+            html += `
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">`;
+            
+            // Table rows (limit to 10 for preview)
+            displayData.slice(0, 10).forEach(row => {
+                html += '<tr class="hover:bg-gray-50">';
+                headers.forEach(header => {
+                    let cellContent = row[header];
+                    if (cellContent === undefined || cellContent === null) {
+                        cellContent = '';
+                    } else if (typeof cellContent === 'object') {
+                        cellContent = JSON.stringify(cellContent);
+                    } else {
+                        cellContent = String(cellContent);
+                    }
+                    
+                    if (cellContent.length > 100) {
+                        cellContent = cellContent.substring(0, 100) + '...';
+                    }
+                    
+                    // Escape HTML in cell content to prevent XSS
+                    const escapedContent = cellContent
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#039;');
+                    
+                    html += `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" title="${escapedContent}">
+                            ${escapedContent}
+                        </td>`;
+                });
+                html += '</tr>';
+            });
+            
+            // Add a row showing "..." if there are more rows
+            if (displayData.length > 10) {
+                html += `
+                    <tr>
+                        <td colspan="${headers.length}" class="px-6 py-2 text-center text-sm text-gray-500">
+                            ... and ${displayData.length - 10} more rows
+                        </td>
+                    </tr>`;
+            }
+            
+            // Close all the HTML tags
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>`;
+            
+            sampleDataContainer.innerHTML = html;
+        }
+        
+        // Show error message
+        function showError(message) {
+            // Create or update error message element
+            let errorEl = document.getElementById('errorMessage');
+            if (!errorEl) {
+                errorEl = document.createElement('div');
+                errorEl.id = 'errorMessage';
+                errorEl.className = 'mb-4 p-4 bg-red-50 border-l-4 border-red-400 rounded';
+                form.parentNode.insertBefore(errorEl, form);
+            }
+            
+            errorEl.innerHTML = `
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-red-700">
+                            ${message}
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            // Scroll to error
+            errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Remove error after 5 seconds
+            setTimeout(() => {
+                if (errorEl) {
+                    errorEl.style.opacity = '0';
+                    setTimeout(() => errorEl.remove(), 300);
+                }
+            }, 5000);
+        }
+        
+        // Auto-resize textarea function
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+        }
+        
+        // Add styles for logs
+        const style = document.createElement('style');
+        style.textContent = `
+            .log-entry {
+                padding: 4px 0;
+                border-bottom: 1px solid #f3f4f6;
+                font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+                font-size: 0.875rem;
+                line-height: 1.25rem;
+            }
+            .log-entry:last-child {
+                border-bottom: none;
+            }
+            .log-entry.info {
+                color: #4b5563;
+            }
+            .log-entry.success {
+                color: #059669;
+            }
+            .log-entry.error {
+                color: #dc2626;
+            }
+            .log-entry.warning {
+                color: #d97706;
+            }
+            #logContainer {
+                scrollbar-width: thin;
+                scrollbar-color: #9ca3af #f3f4f6;
+            }
+            #logContainer::-webkit-scrollbar {
+                width: 6px;
+            }
+            #logContainer::-webkit-scrollbar-track {
+                background: #f3f4f6;
+                border-radius: 3px;
+            }
+            #logContainer::-webkit-scrollbar-thumb {
+                background-color: #9ca3af;
+                border-radius: 3px;
+            }`;
+        document.head.appendChild(style);
+    });
+
+    // Function to log messages to the log container
+    function log(message, type = 'info') {
+        const logContainer = document.getElementById('logContainer');
+        if (!logContainer) return;
+        
+        const timestamp = new Date().toISOString().substr(11, 8);
+        const logEntry = document.createElement('div');
+        logEntry.className = `log-entry ${type}`;
+        logEntry.innerHTML = `<span class="text-gray-500">[${timestamp}]</span> ${message}`;
+        logContainer.appendChild(logEntry);
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+</script>
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.3s ease-out forwards;
+    }
+    
+    .log-entry {
+        opacity: 0;
+        animation: fadeIn 0.3s ease-out forwards;
+    }
+    
+    .log-entry:nth-child(1) { animation-delay: 0.1s; }
+    .log-entry:nth-child(2) { animation-delay: 0.2s; }
+    .log-entry:nth-child(3) { animation-delay: 0.3s; }
+    
+    /* Smooth transitions for showing/hiding sections */
+    .hidden-section {
+        display: none;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+    }
+    
+    .visible-section {
+        display: block;
+        opacity: 1;
+        transition: opacity 0.3s ease-in-out;
+    }
+</style>
+
+{% endblock %}

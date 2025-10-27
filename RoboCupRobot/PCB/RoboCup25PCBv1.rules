@@ -1,0 +1,92 @@
+
+(rules PCB RoboCup25PCBv1
+  (snap_angle 
+    fortyfive_degree
+  )
+  (autoroute_settings
+    (fanout off)
+    (autoroute on)
+    (postroute on)
+    (vias on)
+    (via_costs 50)
+    (plane_via_costs 5)
+    (start_ripup_costs 100)
+    (start_pass_no 317)
+    (layer_rule F.Cu
+      (active on)
+      (preferred_direction horizontal)
+      (preferred_direction_trace_costs 1.0)
+      (against_preferred_direction_trace_costs 2.0)
+    )
+    (layer_rule B.Cu
+      (active on)
+      (preferred_direction vertical)
+      (preferred_direction_trace_costs 1.0)
+      (against_preferred_direction_trace_costs 2.0)
+    )
+  )
+  (rule
+    (width 200.0)
+    (clearance 200.0)
+    (clearance 100.0 (type smd_to_turn_gap))
+    (clearance 50.0 (type smd))
+    (clearance 200.0 (type "kicad_default"))
+  )
+  (padstack "Via[0-1]_600:300_um"
+    (shape
+      (circle F.Cu 600.0 0.0 0.0)
+    )
+    (shape
+      (circle B.Cu 600.0 0.0 0.0)
+    )
+    (attach off)
+  )
+  (via 
+    "Via[0-1]_600:300_um" "Via[0-1]_600:300_um" default
+  )
+  (via 
+    "Via[0-1]_600:300_um-kicad_default" "Via[0-1]_600:300_um" "kicad_default"
+  )
+  (via_rule
+    default "Via[0-1]_600:300_um"
+  )
+  (via_rule
+    "kicad_default" "Via[0-1]_600:300_um-kicad_default"
+  )
+  (class default
+    (clearance_class default)
+    (via_rule default)
+    (rule
+      (width 200.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class "kicad_default"
+    DIR1 "unconnected-(IC1-GND_1-Pad45)" "unconnected-(IC1-D+-Pad50)" "unconnected-(IC1-VUSB-Pad68)" A13 A5 "unconnected-(IC1-TX7-Pad29)" "unconnected-(IC1-TX8-Pad35)"
+    INTERRUPT PWM4 A3 A2 "unconnected-(IC1-MCLK2-Pad33)" A12 "unconnected-(IC1-SCK-Pad13)" DIR4
+    A14 "unconnected-(IC1-GND_5-Pad70)" DIR3 "unconnected-(IC1-RX8-Pad34)" "unconnected-(IC1-ON{slash}OFF-Pad47)" A1 5V PWM1
+    "unconnected-(IC1-CS_2-Pad36)" A9 "unconnected-(IC1-MISO-Pad12)" A6 "unconnected-(IC1-GND_3-Pad49)" "unconnected-(IC1-VBAT-Pad43)" A10 SCL
+    "unconnected-(IC1-GND_4-Pad69)" DIR2 PWM3 "unconnected-(IC1-RX1-Pad57)" A0 SDA "unconnected-(IC1-3.3V_1-Pad42)" "5V GND"
+    "IMU RESET" DIR0 "unconnected-(IC1-PROGRAM-Pad46)" A15 PWM2 A7 "unconnected-(IC1-GND_2-Pad48)" A8
+    "unconnected-(IC1-+5V-Pad52)" "unconnected-(IC1-RX7-Pad28)" A4 "unconnected-(IC1-CS_3-Pad37)" A11 "unconnected-(IC1-D--Pad51)" PWM0 "unconnected-(IC1-TX1-Pad1)"
+    "unconnected-(IC1-3.3V_(250_M_A_MAX)-Pad53)" "unconnected-(IC1-3.3V_2-Pad44)" "Net-(J1-POS)" "12V GND" "Net-(J2-Pin_1)" "Net-(DRV8874_Carrier_Board1-OUT2)" "Net-(DRV8874_Carrier_Board1-OUT1)" "Net-(DRV8874_Carrier_Board2-OUT1)"
+    "Net-(DRV8874_Carrier_Board2-OUT2)" "Net-(DRV8874_Carrier_Board3-OUT1)" "Net-(DRV8874_Carrier_Board3-OUT2)" "Net-(DRV8874_Carrier_Board4-OUT1)" "Net-(DRV8874_Carrier_Board4-OUT2)" "Net-(DRV8874_Carrier_Board5-OUT2)" "Net-(DRV8874_Carrier_Board5-OUT1)" 3.3V
+    "3.3V GND" "unconnected-(PS1-NC-Pad8)" 12V "unconnected-(PS1-CTRL-Pad3)" "unconnected-(PS1-NC-Pad5)" SOL "unconnected-(SW1-A-Pad3)" "unconnected-(U6-PIN21-Pad21)"
+    "unconnected-(U6-PIN24-Pad24)" "unconnected-(U6-CAP-Pad9)" "unconnected-(U6-PS0-Pad6)" "unconnected-(U6-COM2-Pad18)" "unconnected-(U6-PIN7-Pad7)" "unconnected-(U6-PIN12-Pad12)" "unconnected-(U6-COM3-Pad17)" "unconnected-(U6-BL_IND-Pad10)"
+    "unconnected-(U6-PS1-Pad5)" "unconnected-(U6-PIN23-Pad23)" "unconnected-(U6-XOUT32-Pad26)" "unconnected-(U6-PIN1-Pad1)" "unconnected-(U6-PIN22-Pad22)" "unconnected-(U6-PIN8-Pad8)" "unconnected-(U6-PIN13-Pad13)" "unconnected-(U6-~{BOOT_LOAD_PIN}-Pad4)"
+    "unconnected-(U6-XIN32-Pad27)" "unconnected-(DRV8874_Carrier_Board1-VREF-Pad7)" "unconnected-(DRV8874_Carrier_Board1-CS-Pad8)" "unconnected-(DRV8874_Carrier_Board1-FLT-Pad9)" "unconnected-(DRV8874_Carrier_Board1-VM-Pad1)" "unconnected-(DRV8874_Carrier_Board1-IMODE-Pad10)" "unconnected-(DRV8874_Carrier_Board2-CS-Pad8)" "unconnected-(DRV8874_Carrier_Board2-VREF-Pad7)"
+    "unconnected-(DRV8874_Carrier_Board2-VM-Pad1)" "unconnected-(DRV8874_Carrier_Board2-FLT-Pad9)" "unconnected-(DRV8874_Carrier_Board2-IMODE-Pad10)" "unconnected-(DRV8874_Carrier_Board3-VREF-Pad7)" "unconnected-(DRV8874_Carrier_Board3-CS-Pad8)" "unconnected-(DRV8874_Carrier_Board3-IMODE-Pad10)" "unconnected-(DRV8874_Carrier_Board3-FLT-Pad9)" "unconnected-(DRV8874_Carrier_Board3-VM-Pad1)"
+    "unconnected-(DRV8874_Carrier_Board4-VM-Pad1)" "unconnected-(DRV8874_Carrier_Board4-FLT-Pad9)" "unconnected-(DRV8874_Carrier_Board4-CS-Pad8)" "unconnected-(DRV8874_Carrier_Board4-VREF-Pad7)" "unconnected-(DRV8874_Carrier_Board4-IMODE-Pad10)" "unconnected-(DRV8874_Carrier_Board5-IMODE-Pad10)" "unconnected-(DRV8874_Carrier_Board5-VM-Pad1)" "unconnected-(DRV8874_Carrier_Board5-CS-Pad8)"
+    "unconnected-(DRV8874_Carrier_Board5-VREF-Pad7)" "unconnected-(DRV8874_Carrier_Board5-FLT-Pad9)"
+    (clearance_class "kicad_default")
+    (via_rule "kicad_default")
+    (rule
+      (width 200.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+)
