@@ -8,7 +8,7 @@ import os
 from datetime import datetime
 
 # Initialize the OpenAI client with the hardcoded API key
-DEFAULT_API_KEY = "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"
+DEFAULT_API_KEY = "OBFUSCATED"h
 client = OpenAI(api_key=DEFAULT_API_KEY)
 
 class Synthesizer:
