@@ -1,0 +1,18 @@
+include README.md
+include LICENSE
+include requirements.txt
+include pyproject.toml
+
+# Include package data
+recursive-include src/macrocycle_design/*.py
+recursive-include src/macrocycle_design/config/*
+recursive-include src/macrocycle_design/core/*
+recursive-include src/macrocycle_design/utils/*
+
+# Include test files
+global-exclude __pycache__
+global-exclude *.py[cod]
+
+# Documentation
+graft docs
+prune docs/_build

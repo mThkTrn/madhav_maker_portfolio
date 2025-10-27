@@ -1,0 +1,64 @@
+﻿[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "macrocycle-design"
+version = "0.2.15"
+description = "A Python library for de novo design of cyclic peptide binders"
+readme = "README.md"
+authors = [
+    {name = "Madhavendra Thakur", email = "madhavendra.thakur@gmail.com"}
+]
+license = {text = "MIT"}
+requires-python = ">=3.8"
+dependencies = [
+    "numpy>=1.20.0",
+    "biopython>=1.79",
+    "pandas>=1.3.0",
+    "matplotlib>=3.4.0",
+    "nglview>=3.0.0",
+    "prody>=2.0.0"
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=6.0",
+    "pytest-cov>=2.0",
+    "pytest-mock>=3.0"
+]
+dev = [
+    "black>=21.0",
+    "isort>=5.0",
+    "flake8>=3.9",
+    "mypy>=0.900",
+    "pre-commit>=2.0"
+]
+docs = [
+    "sphinx>=4.0",
+    "sphinx-rtd-theme>=0.5.0",
+    "sphinx-autodoc-typehints>=1.0"
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_functions = "test_*"
+python_classes = "Test*"
+addopts = "-v --cov=macrocycle_design --cov-report=term-missing"
+
+[metadata]
+description-file = "README.md"
