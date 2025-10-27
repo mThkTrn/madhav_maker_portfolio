@@ -4,10 +4,6 @@ Welcome to my maker portfolio! This repository serves as a consolidated showcase
 
 ## Projects
 
-### [Liver Annotation](/LiverAnnotation)
-
-### [Macrocycle Design](/macrocycle_design)
-
 ### [Forj](/Forj)
 
 ### [Quiz Bowl Platform](/QuizBowlPlatform)
@@ -19,6 +15,10 @@ Welcome to my maker portfolio! This repository serves as a consolidated showcase
 ### [Vaach](/Vaach)
 
 ### [Wannagram](/Wannagram)
+
+### [Macrocycle Design](/macrocycle_design)
+
+### [Liver Annotation](/LiverAnnotation)
 
 ### [Writeboard](/Writeboard)
 
