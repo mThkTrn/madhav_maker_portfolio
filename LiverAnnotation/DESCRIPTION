@@ -1,0 +1,10 @@
+Package: LiverAnnotation
+Type: Package
+Title: A Package For Classification of Cells and Annotation of Clusters in ScRNA-seq Data 
+Version: 0.1.0
+Author: Madhavendra Thakur
+Maintainer: Madhavendra Thakur <madhavendra.thakur@gmail.com>
+Description: This R script provides functionality to classify cells by cell type and annotate clusters in single-cell RNA-seq data using a pre-trained neural network model. It is designed to work with Seurat objects.
+License: MIT License
+Encoding: UTF-8
+LazyData: true
