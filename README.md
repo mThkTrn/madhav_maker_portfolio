@@ -16,7 +16,7 @@ Welcome to my maker portfolio! This repository serves as a consolidated showcase
 
 ### [Wannagram](/Wannagram)
 
-### [Macrocycle Design](/macrocycle_design)
+### [Macrocycle Design](/MacrocycleDesign)
 
 ### [Liver Annotation](/LiverAnnotation)
 
