@@ -46,7 +46,7 @@ function getLanguagePhrases($conn, $lang_id) {
 // Function to call OpenAI API with context from the database
 function translateWithOpenAI($conn, $text, $lang_id, $lang_name) {
     // Replace with your actual OpenAI API key
-    $apiKey = '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';
+    $apiKey = 'obfuscated';
     
     // Get phrases for the selected language
     $phrases = getLanguagePhrases($conn, $lang_id);
