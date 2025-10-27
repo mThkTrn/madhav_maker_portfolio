@@ -1,0 +1,17 @@
+[package]
+name = "crack-my-app"
+version = "0.1.0"
+
+[dependencies]
+php = "*"
+
+[fs]
+"/" = "."
+
+[env]
+# Load your OpenAI key securely from the .env file
+"OPENAI_API_KEY" = { source = "dotenv", name = "OPENAI_API_KEY" }
+
+[command]
+name = "php"
+args = ["-S", "0.0.0.0:8000", "index.php"]

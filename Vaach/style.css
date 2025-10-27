@@ -1,0 +1,40 @@
+:root{
+  --yellow: #e3b505;
+  --blue: #33658a;
+  --grey: #342a21;
+}
+
+.content{
+  min-height: 50vh;
+}
+
+.brandyellow{
+  background-color: var(--yellow);
+  color: black;
+  border: none;
+}
+
+.brandblue{
+  background-color: var(--blue);
+  border: none;
+}
+
+
+  .tag{
+    background-color: var(--blue);
+    color: white;
+    border-radius: 0.3rem;
+    display: inline-block;
+    padding: 0.3rem;
+    text-align: center ;
+  }
+
+  
+
+  .adjbutton{
+    margin: 0.5rem;
+  }
+
+  .phrasecard{
+    margin: 1rem;
+  }
